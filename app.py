@@ -1,12 +1,15 @@
 import nltk
 nltk.download('stopwords')
 nltk.download('wordnet')
+nltk.download('vader_lexicon') 
 
-import streamlit as st
+import gradio as gr
 import re
 import pickle
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
+from nltk.sentiment import SentimentIntensityAnalyzer 
+sia = SentimentIntensityAnalyzer()
 
 # Setup
 stop_words = set(stopwords.words("english"))
@@ -23,23 +26,45 @@ def clean_text(text):
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# UI
-st.title("🏨 Hotel Review Sentiment Analysis")
-st.write("Analyze hotel reviews using Machine Learning")
-
-review = st.text_area("✍️ Enter your review:", height=150)
-
-model_choice = st.selectbox("Choose Model", ["Logistic Regression", "SVM"])
-
-if st.button("Predict"):
+# Prediction function
+def predict_sentiment(review):
     clean = clean_text(review)
-    vec = vectorizer.transform([clean])
     
-    prediction = model.predict(vec)[0]  # you can add SVM later
+    # ML prediction
+    vec = vectorizer.transform([clean])
+    ml_pred = model.predict(vec)[0]
 
-    if prediction == "Positive":
-        st.success(f"😊 Sentiment: {prediction}")
-    elif prediction == "Negative":
-        st.error(f"😡 Sentiment: {prediction}")
+    # VADER lexicon score
+    score = sia.polarity_scores(review)
+    compound = score['compound']
+
+    # Lexicon prediction
+    if compound >= 0.05:
+        lex_pred = "Positive"
+    elif compound <= -0.05:
+        lex_pred = "Negative"
     else:
-        st.warning(f"😐 Sentiment: {prediction}")
+        lex_pred = "Neutral"
+
+    # Combine logic
+    final_pred = lex_pred if ml_pred == "Neutral" else ml_pred
+
+    # Emoji mapping (clean approach ✅)
+    emoji_map = {
+        "Positive": "😊 Positive",
+        "Negative": "😡 Negative",
+        "Neutral": "😐 Neutral"
+    }
+
+    return emoji_map.get(final_pred, "😐 Neutral")
+
+# Gradio UI
+iface = gr.Interface(
+    fn=predict_sentiment,
+    inputs=gr.Textbox(lines=5, placeholder="Enter your hotel review..."),
+    outputs="text",
+    title="🏨 Hotel Review Sentiment Analysis",
+    description="Analyze hotel reviews using Machine Learning"
+)
+
+iface.launch()
