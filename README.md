@@ -65,10 +65,13 @@ streamlit run app.py
 
 ## 🌐 Deployment
 
-The model is deployed using Streamlit, providing an interactive interface where users can input hotel reviews and receive sentiment predictions.
+The model is deployed using two approaches:
 
----
+- **Streamlit**: Provides a local interactive interface for testing the model  
+- **Hugging Face (Gradio)**: Provides a web-based interface accessible from any device  
 
+This ensures both development-level testing and real-world usability.
+👉 Live Demo :  https://aishu2003-hotel-sentiment-analysis.hf.space/
 ## 📊 Results
 
 - Logistic Regression achieved good performance on classification
