@@ -76,6 +76,11 @@ The model is deployed using Streamlit, providing an interactive interface where 
 - Neutral class is relatively harder to classify due to ambiguity
 
 ---
+## 📊 Evaluation
+
+The model is evaluated using a separate script (`evaluation.py`). Ratings (1–5) are converted into sentiment classes: Negative (1–2), Neutral (3), and Positive (4–5).
+
+Evaluation metrics include accuracy, precision, recall, F1-score, and confusion matrix. The model performs well overall, with slight misclassification in the neutral category.
 
 ## ⚠️ Limitations
 
