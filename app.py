@@ -26,19 +26,15 @@ def clean_text(text):
 model = pickle.load(open("model.pkl", "rb"))
 vectorizer = pickle.load(open("vectorizer.pkl", "rb"))
 
-# Prediction function
 def predict_sentiment(review):
     clean = clean_text(review)
     
-    # ML prediction
     vec = vectorizer.transform([clean])
     ml_pred = model.predict(vec)[0]
 
-    # VADER lexicon score
     score = sia.polarity_scores(review)
     compound = score['compound']
 
-    # Lexicon prediction
     if compound >= 0.05:
         lex_pred = "Positive"
     elif compound <= -0.05:
@@ -46,10 +42,12 @@ def predict_sentiment(review):
     else:
         lex_pred = "Neutral"
 
-    # Combine logic
-    final_pred = lex_pred if ml_pred == "Neutral" else ml_pred
+    # 🔥 FIXED LOGIC
+    if ml_pred != lex_pred:
+        final_pred = lex_pred
+    else:
+        final_pred = ml_pred
 
-    # Emoji mapping (clean approach ✅)
     emoji_map = {
         "Positive": "😊 Positive",
         "Negative": "😡 Negative",
