@@ -41,12 +41,30 @@ def predict_sentiment(review):
         lex_pred = "Negative"
     else:
         lex_pred = "Neutral"
+    # -------------------------------
+# ⭐ Improved Hybrid + Rule Logic
+# -------------------------------
+    review_lower = review.lower()
 
-    # 🔥 FIXED LOGIC
-    if ml_pred != lex_pred:
-        final_pred = lex_pred
+# 🔹 Handle common tricky phrases
+    if any(phrase in review_lower for phrase in ["not bad", "not too bad"]):
+        final_pred = "Positive"
+    elif any(phrase in review_lower for phrase in ["could be better", "okay", "average", "fine"]):
+        final_pred = "Neutral"
+
+# 🔹 Hybrid logic
     else:
-        final_pred = ml_pred
+        if ml_pred == "Neutral":
+            final_pred = lex_pred
+        elif lex_pred == "Neutral":
+            final_pred = lex_pred
+        else:
+            final_pred = ml_pred
+    # # 🔥 FIXED LOGIC
+    # if ml_pred != lex_pred:
+    #     final_pred = lex_pred
+    # else:
+    #     final_pred = ml_pred
 
     emoji_map = {
         "Positive": "😊 Positive",
